@@ -1,7 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Middleware.Configuration.Filters;
 using Middleware.Factory;
-using Middleware.Interfaces;
 using Middleware.Services;
 
 namespace Middleware.Controllers
@@ -9,7 +8,7 @@ namespace Middleware.Controllers
     [ApiController]
     [Route("[controller]")]
 
-    [MyActionFilterAttribute("WeatherForecastController")]
+    //[MyActionFilterAttribute("WeatherForecastController")]
 
     public class WeatherForecastController : ControllerBase
     {
@@ -19,8 +18,8 @@ namespace Middleware.Controllers
     };
 
         private readonly ILogger<WeatherForecastController> _logger;
-        private readonly IEnumerable<IMailService> _mailService;
         private readonly MailFactory _mailFactory;
+        private readonly SingletonService _singletonService;
 
         /// <summary>
         /// This parameter allows the injection of a collection of services that implement the IMailService interface.
@@ -34,10 +33,11 @@ namespace Middleware.Controllers
         //    _logger = logger;
         //}
 
-        public WeatherForecastController(MailFactory mailFactory, ILogger<WeatherForecastController> logger)
+        public WeatherForecastController(MailFactory mailFactory, ILogger<WeatherForecastController> logger, SingletonService singletonService)
         {
             _mailFactory = mailFactory;
             _logger = logger;
+            _singletonService = singletonService;
         }
 
         [HttpGet("[Action]")]
@@ -54,8 +54,8 @@ namespace Middleware.Controllers
         }
 
         [HttpGet("[Action]/{id}")]
-        [MyActionFilterAttribute("GetById")]
-        [MyAsyncActionFilterAttribute("GetByIdAsync", -1)]
+        //[MyActionFilterAttribute("GetById")]
+        //[MyAsyncActionFilterAttribute("GetByIdAsync", -1)]
         public IEnumerable<WeatherForecast> Get([FromRoute] int id)
         {
             /// to find specific service instance using iteration
@@ -68,7 +68,9 @@ namespace Middleware.Controllers
             //    }
             //}
 
-            Console.WriteLine("The Get() action method is being executed.");
+            //Console.WriteLine("The Get() action method is being executed.");
+
+            Console.WriteLine("Hey, I am from Transitive lifetime and intentionally created captive dependency. counter:  " + _singletonService.GetNextCounter());
 
             _mailFactory.GetMailService("localMail").Send();
 
@@ -82,7 +84,7 @@ namespace Middleware.Controllers
         }
 
         [HttpGet("[Action]")]
-        [MyAsyncActionFilterAttribute("SearchInFo", -1)]
+        //[MyAsyncActionFilterAttribute("SearchInFo", -1)]
         public WeatherForecast SearchInFo([FromQuery] string keyWord)
         {
             return new WeatherForecast

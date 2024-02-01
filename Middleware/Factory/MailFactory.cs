@@ -6,7 +6,7 @@ namespace Middleware.Factory
     public class MailFactory
     {
         private readonly IServiceProvider serviceProvider;
-
+        // using ServiceProvider serviceProvider = services.BuildServiceProvider(validateScopes: true);
         public MailFactory(IServiceProvider serviceProvider)
         {
             this.serviceProvider = serviceProvider;
